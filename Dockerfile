@@ -22,7 +22,7 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
  && rm -rf /var/lib/apt/lists/*
 
 # Jenkins swarm
-ENV JENKINS_SWARM_VERSION 3.15
+ENV JENKINS_SWARM_VERSION 3.33
 ENV HOME /home/jenkins-slave
 ENV JENKINS_PERSISTENT_CACHE $HOME/PersistentCache
 ENV USER=jenkins-slave USER_ID=1000 USER_GID=1000
