@@ -7,7 +7,7 @@ node
     // some basic config
     def DOCKERHUB_USERNAME = 'NotDefined'
 
-    def IMAGE_TAG         = (env.BRANCH_NAME == 'u18_04'  ? 'u18_04' : 'u18_04_dev')
+    def IMAGE_TAG         = (env.BRANCH_NAME == 'u22_04'  ? 'u22_04' : 'u22_04_dev')
     //def IMAGE_TAG_SHORT   = IMAGE_TAG.substring(0,1)
     //def IMAGE_TAG_REV     = "${IMAGE_TAG_SHORT}${env.BUILD_NUMBER}"
   
