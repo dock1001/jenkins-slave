@@ -1,18 +1,18 @@
 # Based on https://github.com/rancher/jenkins-slave
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 RUN apt-get update \
  && apt-get -y install \
         apt-transport-https \
         curl \
         git \
-        openjdk-11-jdk \
+        openjdk-21-jdk \
         software-properties-common \
         rsync \
  && rm -rf /var/lib/apt/lists/*
 
 # Export JAVA_HOME variable
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
+# ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 
 # Install the Docker CLI
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
@@ -22,7 +22,7 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
  && rm -rf /var/lib/apt/lists/*
 
 # Jenkins swarm
-ENV JENKINS_SWARM_VERSION 3.36
+ENV JENKINS_SWARM_VERSION 3.47
 ENV HOME /home/jenkins-slave
 ENV JENKINS_PERSISTENT_CACHE $HOME/PersistentCache
 ENV USER=jenkins-slave USER_ID=1000 USER_GID=1000
