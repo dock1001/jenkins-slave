@@ -6,7 +6,7 @@ RUN apt-get update \
         apt-transport-https \
         curl \
         git \
-        openjdk-21-jdk \
+        openjdk-17-jdk \
         software-properties-common \
         rsync \
  && rm -rf /var/lib/apt/lists/*
