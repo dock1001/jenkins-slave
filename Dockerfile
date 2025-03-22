@@ -29,7 +29,6 @@ ENV USER=jenkins-slave USER_ID=1000 USER_GID=1000
 
 RUN groupadd --gid "${USER_GID}" "${USER}" \
  && useradd -c "Jenkins Slave user" -d $HOME -m $USER --uid ${USER_ID} --gid ${USER_GID} \
- && groupadd docker \
  && usermod -aG docker jenkins-slave \
  && curl --create-dirs -sSLo $HOME/swarm-client-$JENKINS_SWARM_VERSION.jar https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/$JENKINS_SWARM_VERSION/swarm-client-$JENKINS_SWARM_VERSION.jar \
  && mkdir /var/jenkins \
