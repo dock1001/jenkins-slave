@@ -1,6 +1,6 @@
 # jenkins-slave-u22_04
 
-Ubuntu 22.04
+Ubuntu 24.04
 - Docker support
 - Jenkins swarm
 

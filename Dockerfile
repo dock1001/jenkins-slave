@@ -1,5 +1,5 @@
 # Based on https://github.com/rancher/jenkins-slave
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 RUN apt-get update \
  && apt-get -y install \
@@ -22,7 +22,7 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
  && rm -rf /var/lib/apt/lists/*
 
 # Jenkins swarm
-ENV JENKINS_SWARM_VERSION 3.47
+ENV JENKINS_SWARM_VERSION 3.50
 ENV HOME /home/jenkins-slave
 ENV JENKINS_PERSISTENT_CACHE $HOME/PersistentCache
 ENV USER=jenkins-slave USER_ID=1000 USER_GID=1000
