@@ -1,6 +1,15 @@
 # Based on https://github.com/rancher/jenkins-slave
 FROM ubuntu:24.04
 
+# Remove 'ubuntu' user and group if they exist
+RUN set -eux; \
+    if getent passwd ubuntu > /dev/null; then \
+        userdel -r ubuntu || true; \
+    fi; \
+    if getent group ubuntu > /dev/null; then \
+        groupdel ubuntu || true; \
+    fi
+
 RUN apt-get update \
  && apt-get -y install \
         apt-transport-https \
