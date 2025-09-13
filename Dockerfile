@@ -1,10 +1,6 @@
 # Based on https://github.com/rancher/jenkins-slave
 FROM ubuntu:24.04
 
-ARG USER_ID=1000 
-ARG USER_GID=1000
-ARG USER=jenkins-slave
-
 # Remove 'ubuntu' user and group if they exist
 RUN set -eux; \
     if getent passwd ubuntu > /dev/null; then \
@@ -38,6 +34,7 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
 ENV JENKINS_SWARM_VERSION 3.50
 ENV HOME /home/jenkins-slave
 ENV JENKINS_PERSISTENT_CACHE $HOME/PersistentCache
+ENV USER=jenkins-slave USER_ID=1000 USER_GID=1000
 
 RUN groupadd --gid "${USER_GID}" "${USER}" \
  && useradd -c "Jenkins Slave user" -d $HOME -m $USER --uid ${USER_ID} --gid ${USER_GID} \
@@ -49,7 +46,7 @@ COPY entrypoint.sh /entrypoint.sh
 
 USER jenkins-slave
 
-RUN mkdir -p "$HOME/PersistentCache"
+RUN mkdir -p $JENKINS_PERSISTENT_CACHE
 
 #ENV JENKINS_USERNAME jenkins
 #ENV JENKINS_PASSWORD jenkins
