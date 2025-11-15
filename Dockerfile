@@ -33,17 +33,18 @@ RUN install -m 0755 -d /etc/apt/keyrings \
  && rm -rf /var/lib/apt/lists/*
 
 # Jenkins swarm
-ENV JENKINS_SWARM_VERSION 3.50
-ENV HOME /home/jenkins-slave
-ENV JENKINS_PERSISTENT_CACHE $HOME/PersistentCache
+ENV JENKINS_SWARM_VERSION=3.50
+ENV HOME=/home/jenkins-slave
+ENV JENKINS_PERSISTENT_CACHE=$HOME/PersistentCache
 ENV USER=jenkins-slave USER_ID=1000 USER_GID=1000
 
 RUN groupadd --gid "${USER_GID}" "${USER}" \
- && useradd -c "Jenkins Slave user" -d $HOME -m $USER --uid ${USER_ID} --gid ${USER_GID} \
- && usermod -aG docker jenkins-slave \
- && curl --create-dirs -sSLo $HOME/swarm-client-$JENKINS_SWARM_VERSION.jar https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/$JENKINS_SWARM_VERSION/swarm-client-$JENKINS_SWARM_VERSION.jar \
+ && useradd -c "Jenkins Slave user" -d $HOME -m $USER --uid ${USER_ID} --gid ${USER_GID}
+
+RUN curl --create-dirs -sSLo $HOME/swarm-client-$JENKINS_SWARM_VERSION.jar https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/$JENKINS_SWARM_VERSION/swarm-client-$JENKINS_SWARM_VERSION.jar \
  && mkdir /var/jenkins \
  && chown jenkins-slave:jenkins-slave /var/jenkins
+
 COPY entrypoint.sh /entrypoint.sh
 
 USER jenkins-slave
