@@ -1,5 +1,5 @@
 # Based on https://github.com/rancher/jenkins-slave
-FROM ubuntu:24.04
+FROM ubuntu:25.10
 
 # Remove 'ubuntu' user and group if they exist
 RUN set -eux; \
