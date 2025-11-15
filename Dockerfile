@@ -24,10 +24,12 @@ RUN apt-get update \
 # ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 
 # Install the Docker CLI
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
- && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable" \
+RUN install -m 0755 -d /etc/apt/keyrings \
+ && curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc \
+ && chmod a+r /etc/apt/keyrings/docker.asc \
+ && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" > /etc/apt/sources.list.d/docker.list \
  && apt-get update \
- && apt-get -q -y install docker-ce \
+ && apt-get -q -y install docker-ce-cli \
  && rm -rf /var/lib/apt/lists/*
 
 # Jenkins swarm
