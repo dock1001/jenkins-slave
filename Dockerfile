@@ -16,6 +16,7 @@ RUN apt-get update \
         curl \
         git \
         openjdk-21-jdk \
+        lftp \
         software-properties-common \
         rsync \
  && rm -rf /var/lib/apt/lists/*
