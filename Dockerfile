@@ -10,6 +10,10 @@ RUN set -eux; \
         groupdel ubuntu || true; \
     fi
 
+# Workaround: security.ubuntu.com is missing libexpat1 2.7.4-1ubuntu0.2 (404).
+# archive.ubuntu.com carries the same resolute-security pocket; remove once fixed.
+RUN sed -i 's|http://security.ubuntu.com/|http://archive.ubuntu.com/|g' /etc/apt/sources.list.d/ubuntu.sources
+
 # Build tools, JDK, tini and the Docker CLI with buildx
 RUN apt-get update \
  && apt-get -y install --no-install-recommends \
