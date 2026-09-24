@@ -20,6 +20,7 @@ RUN apt-get update \
         openjdk-21-jdk-headless \
         rsync \
         tini \
+        wget \
  && install -m 0755 -d /etc/apt/keyrings \
  && curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc \
  && chmod a+r /etc/apt/keyrings/docker.asc \

@@ -6,7 +6,7 @@ A Jenkins agent image that connects to the controller with the Swarm plugin.
 - OpenJDK 21 (headless)
 - Docker CLI + buildx, using the host's Docker daemon
 - Swarm client downloaded from the controller at startup, so it always matches the controller's Swarm plugin
-- `git`, `lftp` and `rsync`
+- `curl`, `wget`, `git`, `lftp` and `rsync`
 
 Intended to work in collaboration with [jenkins-master](https://github.com/dock1001/jenkins-master)
 
