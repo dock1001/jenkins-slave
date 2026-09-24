@@ -1,7 +1,7 @@
 # Based on https://github.com/rancher/jenkins-slave
-FROM ubuntu:25.10
+FROM ubuntu:26.04
 
-# Remove 'ubuntu' user and group if they exist
+# Remove 'ubuntu' user and group if they exist (frees UID/GID 1000)
 RUN set -eux; \
     if getent passwd ubuntu > /dev/null; then \
         userdel -r ubuntu || true; \
@@ -10,31 +10,27 @@ RUN set -eux; \
         groupdel ubuntu || true; \
     fi
 
+# Build tools, JDK, tini and the Docker CLI with buildx
 RUN apt-get update \
- && apt-get -y install \
-        apt-transport-https \
+ && apt-get -y install --no-install-recommends \
+        ca-certificates \
         curl \
         git \
-        openjdk-21-jdk \
         lftp \
-        software-properties-common \
+        openjdk-21-jdk-headless \
         rsync \
- && rm -rf /var/lib/apt/lists/*
-
-# Export JAVA_HOME variable
-# ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
-
-# Install the Docker CLI
-RUN install -m 0755 -d /etc/apt/keyrings \
+        tini \
+ && install -m 0755 -d /etc/apt/keyrings \
  && curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc \
  && chmod a+r /etc/apt/keyrings/docker.asc \
  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" > /etc/apt/sources.list.d/docker.list \
  && apt-get update \
- && apt-get -q -y install docker-ce-cli \
+ && apt-get -y install --no-install-recommends \
+        docker-ce-cli \
+        docker-buildx-plugin \
  && rm -rf /var/lib/apt/lists/*
 
-# Jenkins swarm
-ENV JENKINS_SWARM_VERSION=3.50
+# Agent user
 ENV HOME=/home/jenkins-slave
 ENV JENKINS_PERSISTENT_CACHE=$HOME/PersistentCache
 ENV USER=jenkins-slave USER_ID=1000 USER_GID=1000
@@ -42,8 +38,8 @@ ENV USER=jenkins-slave USER_ID=1000 USER_GID=1000
 RUN groupadd --gid "${USER_GID}" "${USER}" \
  && useradd -c "Jenkins Slave user" -d $HOME -m $USER --uid ${USER_ID} --gid ${USER_GID}
 
-RUN curl --create-dirs -sSLo $HOME/swarm-client-$JENKINS_SWARM_VERSION.jar https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/$JENKINS_SWARM_VERSION/swarm-client-$JENKINS_SWARM_VERSION.jar \
- && mkdir /var/jenkins \
+# The swarm client is downloaded from the controller at startup (see entrypoint.sh)
+RUN mkdir /var/jenkins \
  && chown jenkins-slave:jenkins-slave /var/jenkins
 
 COPY entrypoint.sh /entrypoint.sh
@@ -52,10 +48,6 @@ USER jenkins-slave
 
 RUN mkdir -p $JENKINS_PERSISTENT_CACHE
 
-#ENV JENKINS_USERNAME jenkins
-#ENV JENKINS_PASSWORD jenkins
-#ENV JENKINS_MASTER http://jenkins:8080
-
 VOLUME ["/var/jenkins"]
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/tini", "--", "/entrypoint.sh"]

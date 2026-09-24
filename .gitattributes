@@ -1,0 +1,7 @@
+# The image is built on Linux; always check out with LF, even with core.autocrlf=true
+* text=auto eol=lf
+
+# Must be LF or the shebang breaks inside the container
+*.sh        text eol=lf
+Dockerfile  text eol=lf
+Jenkinsfile text eol=lf

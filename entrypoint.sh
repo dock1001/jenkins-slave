@@ -1,36 +1,47 @@
 #!/bin/sh
 set -e
 
-# jenkins swarm slave
-JAR=`ls -1 $HOME/swarm-client-*.jar | tail -n 1`
-
-PARAMS=""
-if [ ! -z "$JENKINS_USERNAME" ]; then
-  PARAMS="$PARAMS -username $JENKINS_USERNAME"
-fi
-if [ ! -z "$JENKINS_PASSWORD" ]; then
-  PARAMS="$PARAMS -password $JENKINS_PASSWORD"
-fi
-if [ ! -z "$SLAVE_EXECUTORS" ]; then
-  PARAMS="$PARAMS -executors $SLAVE_EXECUTORS"
-fi
-if [ ! -z "$SLAVE_LABELS" ]; then
-  PARAMS="$PARAMS -labels $SLAVE_LABELS"
-fi
-if [ ! -z "$SLAVE_NAME" ]; then
-  PARAMS="$PARAMS -name ${SLAVE_NAME}"
-fi
-if [ ! -z "$JENKINS_MASTER" ]; then
-  PARAMS="$PARAMS -master $JENKINS_MASTER"
+# Controller URL: JENKINS_MASTER, or the Kubernetes service environment
+if [ -n "$JENKINS_MASTER" ]; then
+  URL="$JENKINS_MASTER"
+elif [ -n "$JENKINS_SERVICE_HOST" ] && [ -n "$JENKINS_SERVICE_PORT" ]; then
+  URL="http://$JENKINS_SERVICE_HOST:$JENKINS_SERVICE_PORT"
 else
-  if [ ! -z "$JENKINS_SERVICE_PORT" ]; then
-    # kubernetes environment variable
-    PARAMS="$PARAMS -master http://$SERVICE_HOST:$JENKINS_SERVICE_PORT"
-  fi
+  echo "Error: no controller URL. Set JENKINS_MASTER (e.g. http://jenkins:8080)." >&2
+  exit 1
+fi
+# Strip trailing slashes
+while [ "${URL%/}" != "$URL" ]; do
+  URL="${URL%/}"
+done
+
+# Fetch the swarm client that matches the controller's Swarm plugin
+if ! curl -fsSL --retry 10 --retry-delay 5 --retry-connrefused \
+    -o "$HOME/swarm-client.jar" "$URL/swarm/swarm-client.jar"; then
+  echo "Error: failed to download $URL/swarm/swarm-client.jar" >&2
+  exit 1
 fi
 
-#mkdir $HOME/$HOSTNAME
+set -- -url "$URL" -webSocket
+if [ -n "$JENKINS_USERNAME" ]; then
+  set -- "$@" -username "$JENKINS_USERNAME"
+fi
+if [ -n "$JENKINS_PASSWORD" ]; then
+  # The client reads the password from the environment, keeping it off the command line
+  set -- "$@" -passwordEnvVariable JENKINS_PASSWORD
+fi
+if [ -n "$SLAVE_EXECUTORS" ]; then
+  set -- "$@" -executors "$SLAVE_EXECUTORS"
+fi
+if [ -n "$SLAVE_LABELS" ]; then
+  set -- "$@" -labels "$SLAVE_LABELS"
+fi
+if [ -n "$SLAVE_NAME" ]; then
+  set -- "$@" -name "$SLAVE_NAME"
+fi
+
+echo "Connecting to $URL as ${JENKINS_USERNAME:-<anonymous>}"
 
 # We utilize the shared volume for all instances
-echo Running java -jar $JAR $PARAMS -fsroot /var/jenkins/$HOSTNAME
-exec java -jar $JAR $PARAMS -fsroot /var/jenkins/$HOSTNAME
+# shellcheck disable=SC3028 # Docker sets HOSTNAME in the container environment
+exec java -jar "$HOME/swarm-client.jar" "$@" -fsroot "/var/jenkins/$HOSTNAME"
