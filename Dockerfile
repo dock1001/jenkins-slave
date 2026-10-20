@@ -14,7 +14,7 @@ RUN set -eux; \
 # archive.ubuntu.com carries the same resolute-security pocket; remove once fixed.
 RUN sed -i 's|http://security.ubuntu.com/|http://archive.ubuntu.com/|g' /etc/apt/sources.list.d/ubuntu.sources
 
-# Build tools, JDK, tini and the Docker CLI with buildx
+# Build tools, Python, JDK, tini and the Docker CLI with buildx
 RUN apt-get update \
  && apt-get -y install --no-install-recommends \
         ca-certificates \
@@ -23,6 +23,7 @@ RUN apt-get update \
         lftp \
         openjdk-25-jdk-headless \
         openssh-client \
+        python3 \
         rsync \
         tini \
         wget \
