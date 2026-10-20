@@ -21,7 +21,7 @@ RUN apt-get update \
         curl \
         git \
         lftp \
-        openjdk-21-jdk-headless \
+        openjdk-25-jdk-headless \
         openssh-client \
         rsync \
         tini \
